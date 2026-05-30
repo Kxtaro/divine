@@ -114,11 +114,13 @@
 }
 
 @media (max-width: 480px) {
-  .topbar { padding-top: max(52px, env(safe-area-inset-top)); padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); gap: 4px; }
-  .topbar-pill, .topbar-water-pill { padding: 7px 8px; gap: 5px; }
-  .topbar-pill-label { display: none; }
-  .topbar-pill-count { font-size: 11px; }
-  .topbar-water-add { width: 32px; font-size: 16px; }
+  .topbar { padding-top: max(52px, env(safe-area-inset-top)); padding-left: max(6px, env(safe-area-inset-left)); padding-right: max(6px, env(safe-area-inset-right)); gap: 3px; }
+  .topbar-pill, .topbar-water-pill { padding: 5px 6px; gap: 4px; overflow: hidden; }
+  .topbar-pill-label { font-size: 9px; letter-spacing: 0.06em; flex-shrink: 1; min-width: 0; overflow: hidden; }
+  .topbar-pill-count { display: none; }
+  .topbar-water-pill .topbar-pill-label { display: none; }
+  .topbar-water-pill .topbar-pill-count { display: none; }
+  .topbar-water-add { width: 30px; font-size: 15px; }
 }
 
 /* === Global mobile lockdown ===
