@@ -1,12 +1,10 @@
 // =============================================================
 // Persistent dashboard top bar — Divine edition.
-// Drop this on any page with:
-//     <script src="topbar.js" defer></script>
 // =============================================================
 (function () {
   'use strict';
 
-  // ---- Apply saved theme before any render to minimise flash ----
+  // Apply saved theme before any render to minimise flash
   try { document.documentElement.setAttribute('data-theme', localStorage.getItem('divine-theme') || 'dark'); } catch(e) {}
 
   // -------- Supabase config --------
@@ -17,30 +15,34 @@
   const css = `
 /* ── Divine theme variables ───────────────────────────────── */
 :root {
-  --divine-bg:          #050506;
-  --divine-surface:     #0C0C0D;
-  --divine-border:      rgba(255,255,255,0.09);
-  --divine-text-1:      #FAFAFA;
-  --divine-text-2:      rgba(250,250,250,0.65);
+  --divine-bg:          #050508;
+  --divine-surface:     #0C0B18;
+  --divine-border:      rgba(160,140,255,0.10);
+  --divine-text-1:      #EDE8FF;
+  --divine-text-2:      rgba(210,195,255,0.62);
   --divine-accent:      #F5C518;
   --divine-accent-dim:  rgba(245,197,24,0.14);
-  --divine-pill-bg:     rgba(255,255,255,0.04);
-  --divine-pill-border: rgba(255,255,255,0.07);
+  --divine-pill-bg:     rgba(150,130,255,0.06);
+  --divine-pill-border: rgba(150,130,255,0.11);
 }
 html[data-theme="light"] {
-  --divine-bg:          #F5F4F0;
+  --divine-bg:          #F7F5F2;
   --divine-surface:     #FFFFFF;
-  --divine-border:      rgba(0,0,0,0.09);
-  --divine-text-1:      #0A0A0B;
-  --divine-text-2:      rgba(10,10,11,0.68);
-  --divine-accent:      #C8940A;
-  --divine-accent-dim:  rgba(200,148,10,0.14);
-  --divine-pill-bg:     rgba(0,0,0,0.04);
-  --divine-pill-border: rgba(0,0,0,0.08);
+  --divine-border:      rgba(30,25,50,0.10);
+  --divine-text-1:      #1E1A2E;
+  --divine-text-2:      rgba(30,25,50,0.72);
+  --divine-accent:      #A67800;
+  --divine-accent-dim:  rgba(166,120,0,0.12);
+  --divine-pill-bg:     rgba(30,25,50,0.04);
+  --divine-pill-border: rgba(30,25,50,0.10);
 }
+/* Global light-mode base — overrides per-page hardcoded dark backgrounds */
 html[data-theme="light"] body {
   background: var(--divine-bg) !important;
   color: var(--divine-text-2) !important;
+}
+html[data-theme="light"], html[data-theme="light"] * {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 /* ─────────────────────────────────────────────────────────── */
 
@@ -51,9 +53,9 @@ html[data-theme="light"] body {
   padding-right: max(14px, env(safe-area-inset-right));
   padding-bottom: 10px;
   padding-left: max(14px, env(safe-area-inset-left));
-  background: var(--divine-surface, #0C0C0D);
-  border-bottom: 1px solid var(--divine-border, rgba(255,255,255,0.09));
-  box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  background: var(--divine-surface);
+  border-bottom: 1px solid var(--divine-border);
+  box-shadow: 0 1px 24px rgba(0,0,0,0.35);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   transition: background 0.25s ease, border-color 0.25s ease;
 }
@@ -61,17 +63,17 @@ html[data-theme="light"] body {
   flex: 1 1 0; min-width: 0;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 12px;
-  background: var(--divine-pill-bg, rgba(255,255,255,0.04));
-  border: 1px solid var(--divine-pill-border, rgba(255,255,255,0.07));
+  background: var(--divine-pill-bg);
+  border: 1px solid var(--divine-pill-border);
   border-radius: 11px;
   text-decoration: none;
-  color: var(--divine-text-1, #FAFAFA);
+  color: var(--divine-text-1);
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 .topbar-pill:hover {
-  background: var(--divine-accent-dim, rgba(255,255,255,0.07));
-  border-color: rgba(245,197,24,0.25);
+  background: var(--divine-accent-dim);
+  border-color: rgba(245,197,24,0.28);
 }
 .topbar-pill-dot {
   width: 7px; height: 7px; border-radius: 50%;
@@ -84,64 +86,34 @@ html[data-theme="light"] body {
   animation: topbar-miss-pulse 1.6s ease-in-out infinite;
 }
 @keyframes topbar-miss-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  50%      { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
 }
 .topbar-pill-label {
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--divine-text-2, rgba(255,255,255,0.5));
+  color: var(--divine-text-2);
   flex-shrink: 0;
 }
 .topbar-pill-count {
   margin-left: auto;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 12px; font-weight: 700;
-  color: var(--divine-text-1, #FAFAFA);
+  color: var(--divine-text-1);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.topbar-water-wrap {
-  flex: 1 1 0; min-width: 0;
-  display: flex;
-}
-.topbar-water-pill {
-  flex: 1; min-width: 0;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 12px;
-  background: rgba(125, 211, 252, 0.07);
-  border: 1px solid rgba(125, 211, 252, 0.14);
-  border-right: none;
-  border-radius: 11px 0 0 11px;
-  text-decoration: none;
-  color: var(--divine-text-1, #FAFAFA);
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
-}
-.topbar-water-pill:hover { background: rgba(125, 211, 252, 0.12); }
-.topbar-water-pill .topbar-pill-dot { background: #7DD3FC; }
-.topbar-water-add {
-  flex: 0 0 auto;
-  width: 38px;
-  border: 1px solid rgba(125, 211, 252, 0.14);
-  background: linear-gradient(180deg, rgba(125, 211, 252, 0.22), rgba(110, 231, 183, 0.22));
-  color: #FFFFFF;
-  font-family: inherit; font-size: 17px; font-weight: 700;
-  cursor: pointer;
-  border-radius: 0 11px 11px 0;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, transform 0.10s;
-}
-.topbar-water-add:hover {
-  background: linear-gradient(180deg, rgba(125, 211, 252, 0.34), rgba(110, 231, 183, 0.34));
-}
-.topbar-water-add:active { transform: scale(0.94); }
-.topbar-water-add.flash {
-  background: linear-gradient(180deg, rgba(125, 211, 252, 0.65), rgba(110, 231, 183, 0.65));
-}
-
 .topbar-label-short { display: none; }
 .topbar-label-emoji { display: none; font-size: 15px; line-height: 1; }
+
+/* ── Active pill ─────────────────────────────────────────── */
+.topbar-pill.is-active {
+  background: var(--divine-accent-dim);
+  border-color: rgba(245,197,24,0.32);
+}
+.topbar-pill.is-active .topbar-pill-dot { background: var(--divine-accent); }
+.topbar-pill.is-active .topbar-pill-label,
+.topbar-pill.is-active .topbar-pill-count { color: var(--divine-accent); }
 
 /* ── Divine brand ────────────────────────────────────────── */
 .topbar-brand {
@@ -152,10 +124,10 @@ html[data-theme="light"] body {
   border-radius: 10px;
   transition: background 0.15s;
 }
-.topbar-brand:hover { background: var(--divine-accent-dim, rgba(245,197,24,0.12)); }
+.topbar-brand:hover { background: var(--divine-accent-dim); }
 .topbar-star {
   width: 17px; height: 17px;
-  fill: var(--divine-accent, #F5C518);
+  fill: var(--divine-accent);
   flex-shrink: 0;
   filter: drop-shadow(0 0 5px rgba(245,197,24,0.4));
   transition: fill 0.25s;
@@ -163,7 +135,7 @@ html[data-theme="light"] body {
 .topbar-name {
   font-size: 11px; font-weight: 800;
   letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--divine-accent, #F5C518);
+  color: var(--divine-accent);
   white-space: nowrap;
   transition: color 0.25s;
 }
@@ -172,10 +144,10 @@ html[data-theme="light"] body {
 .topbar-theme-btn {
   flex-shrink: 0;
   width: 32px; height: 32px;
-  border: 1px solid var(--divine-border, rgba(255,255,255,0.09));
+  border: 1px solid var(--divine-border);
   border-radius: 9px;
   background: transparent;
-  color: var(--divine-text-2, rgba(250,250,250,0.65));
+  color: var(--divine-text-2);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   margin-left: 2px;
@@ -183,80 +155,25 @@ html[data-theme="light"] body {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .topbar-theme-btn:hover {
-  background: var(--divine-accent-dim, rgba(245,197,24,0.12));
-  border-color: var(--divine-accent, #F5C518);
-  color: var(--divine-accent, #F5C518);
+  background: var(--divine-accent-dim);
+  border-color: var(--divine-accent);
+  color: var(--divine-accent);
 }
 
-/* ── Active pill (current page) ──────────────────────────── */
-.topbar-pill.is-active {
-  background: var(--divine-accent-dim, rgba(245,197,24,0.12));
-  border-color: rgba(245,197,24,0.3);
-}
-.topbar-pill.is-active .topbar-pill-dot { background: var(--divine-accent, #F5C518); }
-.topbar-pill.is-active .topbar-pill-label,
-.topbar-pill.is-active .topbar-pill-count { color: var(--divine-accent, #F5C518); }
-
+/* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .topbar { padding-top: max(52px, env(safe-area-inset-top)); padding-left: max(6px, env(safe-area-inset-left)); padding-right: max(6px, env(safe-area-inset-right)); gap: 3px; }
   .topbar-pill { padding: 5px 7px; gap: 4px; overflow: hidden; }
   .topbar-pill-count { display: none; }
   .topbar-pill-label { display: none; }
-  .topbar-label-emoji { display: inline; font-size: 15px; }
-  /* Water: collapse pill-link, make the + button the whole tab */
-  .topbar-water-pill { display: none; }
-  .topbar-water-add {
-    flex: 1 1 0; width: auto;
-    border-radius: 11px;
-    border: 1px solid rgba(125, 211, 252, 0.22);
-    font-size: 0;
-  }
-  .topbar-water-add::before { content: '💧'; font-size: 18px; line-height: 1; }
+  .topbar-label-emoji { display: inline; font-size: 16px; }
   .topbar-name { display: none; }
   .topbar-brand { padding: 5px 4px; margin-right: 0; }
   .topbar-theme-btn { width: 28px; height: 28px; margin-left: 1px; }
 }
 
-/* ── Ambient page effects ────────────────────────────────── */
-.divine-fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-/* Dark: shooting stars */
-.divine-star {
-  position: absolute;
-  width: 80px; height: 1.5px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.85) 100%);
-  border-radius: 1px;
-  transform: rotate(-40deg);
-  opacity: 0;
-}
-@keyframes divine-shoot {
-  0%   { opacity: 0;   transform: rotate(-40deg) translateX(-160px); }
-  6%   { opacity: 0.9; }
-  82%  { opacity: 0.6; }
-  100% { opacity: 0;   transform: rotate(-40deg) translateX(160vw); }
-}
-html[data-theme="dark"] .divine-star { animation: divine-shoot linear infinite; }
-html[data-theme="light"] .divine-star { display: none; }
-/* Light: angelic motes */
-.divine-mote {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.95) 0%, rgba(245,197,24,0.4) 38%, transparent 70%);
-  filter: blur(1px);
-  opacity: 0;
-}
-@keyframes divine-float {
-  0%   { opacity: 0;    transform: translateY(0)     scale(0.4); }
-  18%  { opacity: 0.55; transform: translateY(-25px)  scale(0.75); }
-  80%  { opacity: 0.28; transform: translateY(-200px) scale(1.0); }
-  100% { opacity: 0;    transform: translateY(-300px) scale(1.1); }
-}
-html[data-theme="light"] .divine-mote { animation: divine-float ease-in-out infinite; }
-html[data-theme="dark"]  .divine-mote { display: none; }
-
-/* === Global mobile lockdown === */
-html, body {
-  -webkit-text-size-adjust: 100%;
-}
+/* === Global mobile / scroll lockdown === */
+html, body { -webkit-text-size-adjust: 100%; }
 @media (max-width: 768px) {
   html { touch-action: manipulation; }
   ::-webkit-scrollbar { width: 0; height: 0; display: none; }
@@ -265,10 +182,7 @@ html, body {
 .modal-bg, .modal, .po-modal-bg, .po-modal, .wt-overlay, .wt-viewer {
   overscroll-behavior: contain;
 }
-body.topbar-modal-open {
-  overflow: hidden;
-  touch-action: none;
-}
+body.topbar-modal-open { overflow: hidden; touch-action: none; }
 @media (max-width: 480px) {
   .modal-bg, .po-modal-bg {
     padding: 0 !important;
@@ -276,10 +190,8 @@ body.topbar-modal-open {
     justify-content: stretch !important;
   }
   .modal, .po-modal {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 100vh !important;
-    height: 100vh !important;
+    width: 100% !important; max-width: 100% !important;
+    max-height: 100vh !important; height: 100vh !important;
     border-radius: 0 !important;
     padding-top: max(20px, env(safe-area-inset-top)) !important;
     padding-bottom: max(28px, env(safe-area-inset-bottom)) !important;
@@ -308,15 +220,6 @@ body.topbar-modal-open {
     <span class="topbar-pill-label topbar-label-emoji">💊</span>
     <span class="topbar-pill-count" id="topbarStackCount">—/—</span>
   </a>
-  <div class="topbar-water-wrap">
-    <a href="health.html#water" class="topbar-water-pill" id="topbarWater">
-      <span class="topbar-pill-dot"></span>
-      <span class="topbar-pill-label topbar-label-full">Water</span>
-      <span class="topbar-pill-label topbar-label-emoji">💧</span>
-      <span class="topbar-pill-count" id="topbarWaterCount">—/—</span>
-    </a>
-    <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
-  </div>
   <a href="gym.html" class="topbar-pill" id="topbarGym">
     <span class="topbar-pill-dot"></span>
     <span class="topbar-pill-label topbar-label-full">Gym</span>
@@ -332,12 +235,11 @@ body.topbar-modal-open {
 `;
 
   function injectStyleAndHTML() {
-    if (document.getElementById('topbar')) return; // already injected
+    if (document.getElementById('topbar')) return;
     const style = document.createElement('style');
     style.id = 'topbar-style';
     style.textContent = css;
     document.head.appendChild(style);
-
     const wrap = document.createElement('div');
     wrap.innerHTML = html.trim();
     document.body.insertBefore(wrap.firstChild, document.body.firstChild);
@@ -377,31 +279,7 @@ body.topbar-modal-open {
     });
   }
 
-  // -------- Ambient effects --------
-  function _divineInitEffects() {
-    if (document.getElementById('divine-fx')) return;
-    const fx = document.createElement('div');
-    fx.id = 'divine-fx';
-    fx.className = 'divine-fx';
-    // Shooting stars — staggered so they don't all fire at once
-    [[12,8],[38,3],[62,18],[80,6],[22,32],[50,12],[72,25],[8,45]].forEach(([x,y],i) => {
-      const s = document.createElement('div');
-      s.className = 'divine-star';
-      s.style.cssText = 'left:'+x+'%;top:'+y+'%;animation-duration:'+(4+i*1.3)+'s;animation-delay:-'+(i*1.7)+'s;';
-      fx.appendChild(s);
-    });
-    // Angelic motes — start at bottom, rise and fade
-    for (let i = 0; i < 7; i++) {
-      const m = document.createElement('div');
-      m.className = 'divine-mote';
-      const size = 16 + (i * 7) % 28;
-      m.style.cssText = 'left:'+(5+i*13%88)+'%;bottom:'+(i%3*8)+'%;width:'+size+'px;height:'+size+'px;animation-duration:'+(8+i*1.9%6)+'s;animation-delay:-'+(i*1.6)+'s;';
-      fx.appendChild(m);
-    }
-    document.body.appendChild(fx);
-  }
-
-  // -------- Active-date helpers (match the goals page 6 AM rollover) --------
+  // -------- Active-date helpers --------
   function activeDateKey() {
     const now = new Date();
     const d = new Date(now);
@@ -410,23 +288,15 @@ body.topbar-modal-open {
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
   }
-  function calendarDateKey() {
-    const d = new Date();
-    return d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
-  }
 
-  // -------- Read progress from localStorage --------
+  // -------- Progress readers --------
   function getGoalsProgress() {
-    const key = 'goals:' + activeDateKey();
     let goals = [];
-    try { goals = JSON.parse(localStorage.getItem(key)) || []; } catch (e) {}
+    try { goals = JSON.parse(localStorage.getItem('goals:' + activeDateKey())) || []; } catch (e) {}
     const total = Array.isArray(goals) ? goals.length : 0;
     const done = total ? goals.filter(g => g && g.done).length : 0;
     return { done, total };
   }
-
   function getStackProgress() {
     let items = [];
     try { items = JSON.parse(localStorage.getItem('stack:items')) || []; } catch (e) {}
@@ -437,155 +307,47 @@ body.topbar-modal-open {
     return { done, total };
   }
 
-  function getWaterProgress() {
-    let state = null;
-    try { state = JSON.parse(localStorage.getItem('po_water_v1')); } catch (e) {}
-    if (!state) return { done: 0, total: 0 };
-    const todayKey = calendarDateKey();
-    const done = (state.logs || {})[todayKey] || 0;
-    const p = state.profile || { weightKg: 75 };
-    const wKg = state.weightUnit === 'lb' ? (p.weightKg || 0) / 2.20462 : (p.weightKg || 0);
-    const base = wKg * 35;
-    const exercise = (p.activityHrsPerWeek || 0) / 7 * 500;
-    const caffeine = Math.max(0, (state.caffeineMgPerDay || 0) - 200) * 1.5;
-    const subs = (state.substances || []).reduce((s, x) => {
-      const dose = (x && x.dose != null ? x.dose : (x && x.defaultDose)) || 0;
-      return s + Math.max(0, dose * ((x && x.mlPerUnit) || 0));
-    }, 0);
-    let adjust = 0;
-    if (p.sex === 'm') adjust += 200;
-    if ((p.age || 0) >= 50) adjust += 100;
-    const totalMl = base + exercise + caffeine + subs + adjust;
-    let unitVol;
-    if (state.unit === 'glass') unitVol = state.glassMl || 250;
-    else if (state.unit === 'oz') unitVol = 30;
-    else if (state.unit === 'ml') unitVol = 1;
-    else unitVol = state.bottleMl || 500;
-    const total = Math.max(1, Math.ceil(totalMl / unitVol));
-    return { done, total };
-  }
-
   function classifyStatus(done, total) {
     if (total === 0) return 'idle';
     if (done >= total) return 'good';
-    if (done >= total * 0.5) return 'warn';
     const h = new Date().getHours();
     if (h >= 18 && done < total * 0.5) return 'miss';
     return 'warn';
   }
-
-  function setPillStatus(pillEl, status) {
-    pillEl.classList.remove('good', 'warn', 'miss');
-    if (status === 'warn' || status === 'miss') pillEl.classList.add(status);
+  function setPillStatus(el, status) {
+    if (!el) return;
+    el.classList.remove('good', 'warn', 'miss');
+    if (status === 'warn' || status === 'miss') el.classList.add(status);
   }
 
   function render() {
     const goalsEl = document.getElementById('topbarGoals');
-    const stackEl = document.getElementById('topbarStack');
-    const waterEl = document.getElementById('topbarWater');
     if (!goalsEl) return;
-
     const g = getGoalsProgress();
     const s = getStackProgress();
-    const w = getWaterProgress();
-
-    document.getElementById('topbarGoalsCount').textContent =
-      g.total ? g.done + '/' + g.total : '0/0';
-    document.getElementById('topbarStackCount').textContent =
-      s.total ? s.done + '/' + s.total : '0/0';
-    document.getElementById('topbarWaterCount').textContent =
-      w.total ? w.done + '/' + w.total : '0/0';
-
+    const gc = document.getElementById('topbarGoalsCount');
+    const sc = document.getElementById('topbarStackCount');
+    if (gc) gc.textContent = g.total ? g.done + '/' + g.total : '—';
+    if (sc) sc.textContent = s.total ? s.done + '/' + s.total : '—';
     setPillStatus(goalsEl, classifyStatus(g.done, g.total));
-    setPillStatus(stackEl, classifyStatus(s.done, s.total));
-    setPillStatus(waterEl, classifyStatus(w.done, w.total));
+    setPillStatus(document.getElementById('topbarStack'), classifyStatus(s.done, s.total));
   }
 
-  // -------- Water +1 (works from any page) --------
-  function defaultWaterState() {
-    return {
-      unit: 'bottle', bottleMl: 500, glassMl: 250, weightUnit: 'kg',
-      profile: { weightKg: 75, age: 25, sex: 'm', activityHrsPerWeek: 5 },
-      caffeineMgPerDay: 200, substances: [], logs: {}
-    };
-  }
-
-  async function pushWaterMergedToSupabase(localWater) {
-    if (window.location.pathname.endsWith('/health.html') ||
-        window.location.pathname.endsWith('health.html')) return;
-
-    if (!window.supabase || !TOPBAR_SUPABASE_URL || !TOPBAR_SUPABASE_KEY) return;
-    if (TOPBAR_SUPABASE_URL.indexOf('PASTE-') === 0) return;
-
-    try {
-      const supa = window.supabase.createClient(TOPBAR_SUPABASE_URL, TOPBAR_SUPABASE_KEY);
-      const { data } = await supa
-        .from('app_state').select('data').eq('key', 'health').maybeSingle();
-      const current = (data && data.data) || {};
-      const merged = Object.assign({}, current, { po_water_v1: localWater });
-      await supa.from('app_state').upsert(
-        { key: 'health', data: merged, updated_at: new Date().toISOString() },
-        { onConflict: 'key' }
-      );
-    } catch (e) {}
-  }
-
-  function addWater() {
-    let state = null;
-    try { state = JSON.parse(localStorage.getItem('po_water_v1')); } catch (e) {}
-    if (!state || typeof state !== 'object') state = defaultWaterState();
-    state.logs = state.logs || {};
-    const k = calendarDateKey();
-    state.logs[k] = (state.logs[k] || 0) + 1;
-    try { localStorage.setItem('po_water_v1', JSON.stringify(state)); } catch (e) {}
-    render();
-
-    const btn = document.getElementById('topbarWaterAdd');
-    if (btn) {
-      btn.classList.add('flash');
-      setTimeout(() => btn.classList.remove('flash'), 220);
-    }
-
-    pushWaterMergedToSupabase(state);
-  }
-
-  // -------- Mobile lockdown helpers --------
-  function blockGesture(e) { e.preventDefault(); }
-  function lockGestures() {
-    document.addEventListener('gesturestart', blockGesture, { passive: false });
-    document.addEventListener('gesturechange', blockGesture, { passive: false });
-    document.addEventListener('gestureend', blockGesture, { passive: false });
-    let lastTouch = 0;
-    document.addEventListener('touchend', (e) => {
-      const now = Date.now();
-      if (now - lastTouch <= 300) e.preventDefault();
-      lastTouch = now;
-    }, { passive: false });
-  }
-
+  // -------- Modal scroll lock --------
   function startModalLock() {
-    const MODAL_SELECTORS = [
-      '.modal-bg', '.po-modal-bg', '.wt-overlay', '.wt-viewer', '.wt-cam'
-    ];
+    const SEL = ['.modal-bg', '.po-modal-bg', '.wt-overlay', '.wt-viewer', '.wt-cam'];
     function anyOpen() {
-      for (const sel of MODAL_SELECTORS) {
-        const els = document.querySelectorAll(sel);
+      for (const s of SEL) {
+        const els = document.querySelectorAll(s);
         for (const el of els) {
-          if (el.classList.contains('show') || el.classList.contains('is-open')) {
-            return true;
-          }
+          if (el.classList.contains('show') || el.classList.contains('is-open')) return true;
         }
       }
       return false;
     }
-    function sync() {
-      document.body.classList.toggle('topbar-modal-open', anyOpen());
-    }
-    const observer = new MutationObserver(sync);
-    observer.observe(document.body, {
-      attributes: true, attributeFilter: ['class'], subtree: true
-    });
-    sync();
+    const obs = new MutationObserver(() => document.body.classList.toggle('topbar-modal-open', anyOpen()));
+    obs.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+    document.body.classList.toggle('topbar-modal-open', anyOpen());
   }
 
   // -------- Boot --------
@@ -593,16 +355,11 @@ body.topbar-modal-open {
     injectStyleAndHTML();
     _divineSetupTheme();
     _divineMarkActive();
-    _divineInitEffects();
-    const btn = document.getElementById('topbarWaterAdd');
-    if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
     startModalLock();
-
     window.addEventListener('storage', render);
     window.addEventListener('focus', render);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
-
     setInterval(render, 30 * 1000);
   }
 

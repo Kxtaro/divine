@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>Progressive Overload Coach</title>
+<title>Divine — Gym</title>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('divine-theme')||'dark')}catch(e){}</script>
 <script src="topbar.js" defer></script>
 
@@ -18,7 +18,7 @@
      ============================================================= -->
 <script>
 const CONFIG = {
-  appTitle: "Progressive Overload Coach",
+  appTitle: "Gym Tracker",
 
   // Weight unit shown everywhere. "kg" or "lb".
   units: "kg",
@@ -1265,23 +1265,35 @@ img, video, canvas, svg { max-width: 100%; }
 
 .hidden { display: none !important; }
 /* ── Light mode ────────────────────────────────────────── */
-html[data-theme="light"] body {
-  background: #F5F4F0 !important;
-  background-image: none !important;
+html[data-theme="light"] {
+  --bg: #F7F5F2; --bg-card: #FFFFFF;
+  --text-1: #1E1A2E;
+  --text-2: rgba(30,25,50,0.72);
+  --text-3: rgba(30,25,50,0.50);
+  --text-4: rgba(30,25,50,0.32);
+  --border: rgba(30,25,50,0.09);
+  --border-strong: rgba(30,25,50,0.15);
+  --accent: #1E1A2E;
+  --good: #1A7A50; --warn: #906200; --bad: #B03020;
 }
+html[data-theme="light"] body { background: #F7F5F2 !important; background-image: none !important; }
 html[data-theme="light"] .card {
-  background: rgba(255,255,255,0.85) !important;
-  border: 1px solid rgba(0,0,0,0.07) !important;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
+  background: #FFFFFF !important;
+  border: 1px solid rgba(30,25,50,0.09) !important;
+  box-shadow: 0 2px 12px rgba(30,25,50,0.07) !important;
 }
 html[data-theme="light"] .tabbar {
-  background: linear-gradient(180deg, rgba(245,244,240,0) 0%, rgba(245,244,240,0.9) 40%, #F5F4F0 100%) !important;
+  background: linear-gradient(180deg, rgba(247,245,242,0) 0%, rgba(247,245,242,0.92) 38%, #F7F5F2 100%) !important;
 }
-html[data-theme="light"] .tab { color: rgba(10,10,11,0.5) !important; }
-html[data-theme="light"] .tab.is-active { color: var(--divine-accent, #C8940A) !important; }
-html[data-theme="light"] .po-seg-control { background: rgba(0,0,0,0.06) !important; }
-html[data-theme="light"] .po-seg-btn { color: rgba(10,10,11,0.5) !important; }
-html[data-theme="light"] .po-seg-btn.is-active { background: #fff !important; color: #0A0A0B !important; }
+html[data-theme="light"] .tab { color: rgba(30,25,50,0.50) !important; }
+html[data-theme="light"] .tab.is-active { color: var(--divine-accent, #A67800) !important; }
+html[data-theme="light"] .po-seg-control { background: rgba(30,25,50,0.07) !important; border-color: rgba(30,25,50,0.10) !important; }
+html[data-theme="light"] .po-seg-btn { color: rgba(30,25,50,0.55) !important; }
+html[data-theme="light"] .po-seg-btn.is-active { background: #FFFFFF !important; color: #1E1A2E !important; box-shadow: 0 1px 4px rgba(30,25,50,0.12) !important; }
+html[data-theme="light"] .po-reps-pill { background: rgba(30,25,50,0.05) !important; border-color: rgba(30,25,50,0.10) !important; color: rgba(30,25,50,0.70) !important; }
+html[data-theme="light"] .po-reps-pill.is-active { background: #1E1A2E !important; color: #F7F5F2 !important; }
+html[data-theme="light"] .po-input { background: rgba(255,255,255,0.9) !important; border-color: rgba(30,25,50,0.14) !important; color: #1E1A2E !important; }
+html[data-theme="light"] .wt-viewer { background: #F7F5F2 !important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1453,7 +1465,7 @@ html[data-theme="light"] .po-seg-btn.is-active { background: #fff !important; co
   </div>
 
   <div class="po-header">
-    <h1 class="po-title" id="appTitle">Progressive Overload Coach</h1>
+    <h1 class="po-title" id="appTitle">Gym Tracker</h1>
     <button class="po-icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
@@ -1462,10 +1474,6 @@ html[data-theme="light"] .po-seg-btn.is-active { background: #fff !important; co
   <div class="card">
     <!-- Filters -->
     <div class="po-filters">
-      <div class="po-seg-row">
-        <span class="po-seg-label">Gym</span>
-        <div class="po-seg-control" id="gymSeg"></div>
-      </div>
       <div class="po-seg-row">
         <span class="po-seg-label">Day</span>
         <div class="po-seg-control" id="daySeg"></div>
@@ -1782,7 +1790,7 @@ html[data-theme="light"] .po-seg-btn.is-active { background: #fff !important; co
   function roundToStep(v, s) { return Math.round(v / s) * s; }
   function getFiltered() {
     return state.exercises.filter(e =>
-      (e.gym === state.filterGym || e.gym === 'both') && e.day === state.filterDay);
+      e.day === state.filterDay);
   }
   function getCurrentEx() {
     const f = getFiltered();
@@ -1826,15 +1834,9 @@ html[data-theme="light"] .po-seg-btn.is-active { background: #fff !important; co
   // RENDER
   // ============================================================
   function renderFilters() {
-    $('gymSeg').innerHTML = state.gyms.map(g =>
-      '<button class="po-seg-btn ' + (g.id === state.filterGym ? 'active' : '') + '" data-gym="' + g.id + '">' + escape(g.name) + '</button>'
-    ).join('');
     $('daySeg').innerHTML = state.days.map(d =>
       '<button class="po-seg-btn ' + (d.id === state.filterDay ? 'active' : '') + '" data-day="' + d.id + '">' + escape(d.name) + '</button>'
     ).join('');
-    $('gymSeg').querySelectorAll('.po-seg-btn').forEach(b => {
-      b.addEventListener('click', () => { state.filterGym = b.dataset.gym; state.currentEx = null; saveState(); renderAll(); });
-    });
     $('daySeg').querySelectorAll('.po-seg-btn').forEach(b => {
       b.addEventListener('click', () => {
         state.filterDay = b.dataset.day;
