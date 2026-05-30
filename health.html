@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050506">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="color-scheme" content="dark">
-<title>Daily Stack — Customizable Template</title>
+<title>Divine — Stack</title>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('divine-theme')||'dark')}catch(e){}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="sync.js" defer></script>
@@ -440,9 +441,8 @@ main {
   .stack-card { padding: 18px 16px 14px; }
   .stack-item { grid-template-columns: 28px 1fr auto; gap: 8px; }
   .stack-item .stack-low-btn { grid-column: 2 / 4; margin-top: 4px; justify-self: start; }
-  .stack-add-row { grid-template-columns: 1fr 1fr; }
-  .stack-add-row .stack-add-btn { grid-column: 1 / -1; }
-  .stack-add-row .stack-select { grid-column: 1 / -1; }
+  .stack-add-row { grid-template-columns: 1fr 1fr; gap: 5px; }
+  .stack-add-btn, .stack-select, .stack-input { font-size: 12px; padding: 7px 9px; }
   .stack-search-results { width: 100%; }
 }
 
@@ -512,7 +512,6 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12
     </div>
   </div>
 
-  <div class="attribution">// editable template · all data stays in your browser</div>
 </main>
 
 <script>

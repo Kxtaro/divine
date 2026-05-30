@@ -140,6 +140,9 @@ html[data-theme="light"] body {
   background: linear-gradient(180deg, rgba(125, 211, 252, 0.65), rgba(110, 231, 183, 0.65));
 }
 
+.topbar-label-short { display: none; }
+.topbar-label-emoji { display: none; font-size: 15px; line-height: 1; }
+
 /* ── Divine brand ────────────────────────────────────────── */
 .topbar-brand {
   display: flex; align-items: center; gap: 6px;
@@ -201,7 +204,9 @@ html[data-theme="light"] body {
   .topbar-pill-count { display: none; }
   .topbar-water-pill .topbar-pill-label { display: none; }
   .topbar-water-pill .topbar-pill-count { display: none; }
-  .topbar-water-add { width: 30px; font-size: 15px; }
+  .topbar-water-add { width: 38px; font-size: 15px; }
+  .topbar-pill-label { display: none; }
+  .topbar-label-emoji { display: inline; }
   .topbar-name { display: none; }
   .topbar-brand { padding: 5px 4px; margin-right: 0; }
   .topbar-theme-btn { width: 28px; height: 28px; margin-left: 1px; }
@@ -212,7 +217,7 @@ html, body {
   -webkit-text-size-adjust: 100%;
 }
 @media (max-width: 768px) {
-  html { touch-action: pan-y; }
+  html { touch-action: manipulation; }
   ::-webkit-scrollbar { width: 0; height: 0; display: none; }
   html, body { scrollbar-width: none; -ms-overflow-style: none; }
 }
@@ -252,29 +257,34 @@ body.topbar-modal-open {
   </a>
   <a href="index.html" class="topbar-pill" id="topbarGoals">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">Goals</span>
+    <span class="topbar-pill-label topbar-label-full">Goals</span>
+    <span class="topbar-pill-label topbar-label-emoji">🎯</span>
     <span class="topbar-pill-count" id="topbarGoalsCount">—/—</span>
   </a>
   <a href="health.html" class="topbar-pill" id="topbarStack">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">Stack</span>
+    <span class="topbar-pill-label topbar-label-full">Stack</span>
+    <span class="topbar-pill-label topbar-label-emoji">💊</span>
     <span class="topbar-pill-count" id="topbarStackCount">—/—</span>
   </a>
   <div class="topbar-water-wrap">
     <a href="health.html#water" class="topbar-water-pill" id="topbarWater">
       <span class="topbar-pill-dot"></span>
-      <span class="topbar-pill-label">Water</span>
+      <span class="topbar-pill-label topbar-label-full">Water</span>
+      <span class="topbar-pill-label topbar-label-emoji">💧</span>
       <span class="topbar-pill-count" id="topbarWaterCount">—/—</span>
     </a>
     <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
   </div>
   <a href="gym.html" class="topbar-pill" id="topbarGym">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">Gym</span>
+    <span class="topbar-pill-label topbar-label-full">Gym</span>
+    <span class="topbar-pill-label topbar-label-emoji">💪</span>
   </a>
   <a href="finance.html" class="topbar-pill" id="topbarFinance">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">Finance</span>
+    <span class="topbar-pill-label topbar-label-full">Finance</span>
+    <span class="topbar-pill-label topbar-label-emoji">💰</span>
   </a>
   <button class="topbar-theme-btn" id="topbarThemeToggle" type="button" aria-label="Toggle theme"></button>
 </header>
@@ -521,7 +531,6 @@ body.topbar-modal-open {
     const btn = document.getElementById('topbarWaterAdd');
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
-    lockGestures();
     startModalLock();
 
     window.addEventListener('storage', render);
