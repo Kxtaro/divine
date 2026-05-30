@@ -199,18 +199,59 @@ html[data-theme="light"] body {
 
 @media (max-width: 480px) {
   .topbar { padding-top: max(52px, env(safe-area-inset-top)); padding-left: max(6px, env(safe-area-inset-left)); padding-right: max(6px, env(safe-area-inset-right)); gap: 3px; }
-  .topbar-pill, .topbar-water-pill { padding: 5px 6px; gap: 4px; overflow: hidden; }
-  .topbar-pill-label { font-size: 9px; letter-spacing: 0.06em; flex-shrink: 1; min-width: 0; overflow: hidden; }
+  .topbar-pill { padding: 5px 7px; gap: 4px; overflow: hidden; }
   .topbar-pill-count { display: none; }
-  .topbar-water-pill .topbar-pill-label { display: none; }
-  .topbar-water-pill .topbar-pill-count { display: none; }
-  .topbar-water-add { width: 38px; font-size: 15px; }
   .topbar-pill-label { display: none; }
-  .topbar-label-emoji { display: inline; }
+  .topbar-label-emoji { display: inline; font-size: 15px; }
+  /* Water: collapse pill-link, make the + button the whole tab */
+  .topbar-water-pill { display: none; }
+  .topbar-water-add {
+    flex: 1 1 0; width: auto;
+    border-radius: 11px;
+    border: 1px solid rgba(125, 211, 252, 0.22);
+    font-size: 0;
+  }
+  .topbar-water-add::before { content: '💧'; font-size: 18px; line-height: 1; }
   .topbar-name { display: none; }
   .topbar-brand { padding: 5px 4px; margin-right: 0; }
   .topbar-theme-btn { width: 28px; height: 28px; margin-left: 1px; }
 }
+
+/* ── Ambient page effects ────────────────────────────────── */
+.divine-fx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+/* Dark: shooting stars */
+.divine-star {
+  position: absolute;
+  width: 80px; height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.85) 100%);
+  border-radius: 1px;
+  transform: rotate(-40deg);
+  opacity: 0;
+}
+@keyframes divine-shoot {
+  0%   { opacity: 0;   transform: rotate(-40deg) translateX(-160px); }
+  6%   { opacity: 0.9; }
+  82%  { opacity: 0.6; }
+  100% { opacity: 0;   transform: rotate(-40deg) translateX(160vw); }
+}
+html[data-theme="dark"] .divine-star { animation: divine-shoot linear infinite; }
+html[data-theme="light"] .divine-star { display: none; }
+/* Light: angelic motes */
+.divine-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.95) 0%, rgba(245,197,24,0.4) 38%, transparent 70%);
+  filter: blur(1px);
+  opacity: 0;
+}
+@keyframes divine-float {
+  0%   { opacity: 0;    transform: translateY(0)     scale(0.4); }
+  18%  { opacity: 0.55; transform: translateY(-25px)  scale(0.75); }
+  80%  { opacity: 0.28; transform: translateY(-200px) scale(1.0); }
+  100% { opacity: 0;    transform: translateY(-300px) scale(1.1); }
+}
+html[data-theme="light"] .divine-mote { animation: divine-float ease-in-out infinite; }
+html[data-theme="dark"]  .divine-mote { display: none; }
 
 /* === Global mobile lockdown === */
 html, body {
@@ -334,6 +375,30 @@ body.topbar-modal-open {
       const isHome = key === 'index' && (path === '/' || path.endsWith('/') || path.endsWith('index.html'));
       el.classList.toggle('is-active', isHome || (!isHome && path.includes('/' + key)));
     });
+  }
+
+  // -------- Ambient effects --------
+  function _divineInitEffects() {
+    if (document.getElementById('divine-fx')) return;
+    const fx = document.createElement('div');
+    fx.id = 'divine-fx';
+    fx.className = 'divine-fx';
+    // Shooting stars — staggered so they don't all fire at once
+    [[12,8],[38,3],[62,18],[80,6],[22,32],[50,12],[72,25],[8,45]].forEach(([x,y],i) => {
+      const s = document.createElement('div');
+      s.className = 'divine-star';
+      s.style.cssText = 'left:'+x+'%;top:'+y+'%;animation-duration:'+(4+i*1.3)+'s;animation-delay:-'+(i*1.7)+'s;';
+      fx.appendChild(s);
+    });
+    // Angelic motes — start at bottom, rise and fade
+    for (let i = 0; i < 7; i++) {
+      const m = document.createElement('div');
+      m.className = 'divine-mote';
+      const size = 16 + (i * 7) % 28;
+      m.style.cssText = 'left:'+(5+i*13%88)+'%;bottom:'+(i%3*8)+'%;width:'+size+'px;height:'+size+'px;animation-duration:'+(8+i*1.9%6)+'s;animation-delay:-'+(i*1.6)+'s;';
+      fx.appendChild(m);
+    }
+    document.body.appendChild(fx);
   }
 
   // -------- Active-date helpers (match the goals page 6 AM rollover) --------
@@ -528,6 +593,7 @@ body.topbar-modal-open {
     injectStyleAndHTML();
     _divineSetupTheme();
     _divineMarkActive();
+    _divineInitEffects();
     const btn = document.getElementById('topbarWaterAdd');
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
