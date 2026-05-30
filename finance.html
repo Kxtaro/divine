@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0a0a0b">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Finances</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('divine-theme')||'dark')}catch(e){}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="sync.js" defer></script>
 <script src="topbar.js" defer></script>
@@ -1568,6 +1569,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 @media (max-width: 600px) {
   .sub-auto-toggle { width: 100%; justify-content: space-between; padding: 12px 14px; }
 }
+/* ── Light mode ────────────────────────────────────────── */
+html[data-theme="light"] body { background: #F5F4F0 !important; }
+html[data-theme="light"] body::before, html[data-theme="light"] body::after { opacity: 0.12; }
+html[data-theme="light"] .fin-card {
+  background: rgba(255,255,255,0.85) !important;
+  border-color: rgba(0,0,0,0.07) !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
+}
+html[data-theme="light"] .bottom-tabs {
+  background: linear-gradient(180deg, transparent, rgba(245,244,240,0.95) 30%) !important;
+}
+html[data-theme="light"] .bottom-tab { color: rgba(10,10,11,0.5) !important; }
+html[data-theme="light"] .bottom-tab.is-active { color: var(--divine-accent, #C8940A) !important; }
+html[data-theme="light"] .nw-section-title { color: rgba(10,10,11,0.38) !important; }
+html[data-theme="light"] .sub-item { border-color: rgba(0,0,0,0.07) !important; background: rgba(255,255,255,0.7) !important; }
 </style>
 </head>
 <body>

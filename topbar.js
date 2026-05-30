@@ -1,55 +1,82 @@
-﻿// =============================================================
-// Persistent dashboard top bar.
+// =============================================================
+// Persistent dashboard top bar — Divine edition.
 // Drop this on any page with:
 //     <script src="topbar.js" defer></script>
-// It self-injects HTML + CSS, reads progress from the same
-// localStorage keys the dashboard's tabs already use, and a
-// water "+1" button writes to localStorage and (if configured)
-// pushes a merged update to the Supabase health row so the
-// new bottle appears on every device within ~1 second.
 // =============================================================
 (function () {
   'use strict';
 
-  // -------- Supabase config (same project as the rest of the dashboard) --------
-  // For your audience's standalone, replace these with placeholders
-  // and have them paste their own values, just like the other pages.
+  // ---- Apply saved theme before any render to minimise flash ----
+  try { document.documentElement.setAttribute('data-theme', localStorage.getItem('divine-theme') || 'dark'); } catch(e) {}
+
+  // -------- Supabase config --------
   const TOPBAR_SUPABASE_URL = 'https://reatwgqnfuiomdidrhdd.supabase.co';
   const TOPBAR_SUPABASE_KEY = 'sb_publishable_hjm63T8ml2uo-2wNndQYmg_sA2oc4iZ';
 
   // -------- CSS --------
   const css = `
+/* ── Divine theme variables ───────────────────────────────── */
+:root {
+  --divine-bg:          #050506;
+  --divine-surface:     #0C0C0D;
+  --divine-border:      rgba(255,255,255,0.09);
+  --divine-text-1:      #FAFAFA;
+  --divine-text-2:      rgba(250,250,250,0.65);
+  --divine-accent:      #F5C518;
+  --divine-accent-dim:  rgba(245,197,24,0.14);
+  --divine-pill-bg:     rgba(255,255,255,0.04);
+  --divine-pill-border: rgba(255,255,255,0.07);
+}
+html[data-theme="light"] {
+  --divine-bg:          #F5F4F0;
+  --divine-surface:     #FFFFFF;
+  --divine-border:      rgba(0,0,0,0.09);
+  --divine-text-1:      #0A0A0B;
+  --divine-text-2:      rgba(10,10,11,0.68);
+  --divine-accent:      #C8940A;
+  --divine-accent-dim:  rgba(200,148,10,0.14);
+  --divine-pill-bg:     rgba(0,0,0,0.04);
+  --divine-pill-border: rgba(0,0,0,0.08);
+}
+html[data-theme="light"] body {
+  background: var(--divine-bg) !important;
+  color: var(--divine-text-2) !important;
+}
+/* ─────────────────────────────────────────────────────────── */
+
 .topbar {
   position: sticky; top: 0; z-index: 40;
-  display: flex; gap: 6px;
+  display: flex; align-items: center; gap: 6px;
   padding-top: max(12px, env(safe-area-inset-top));
   padding-right: max(14px, env(safe-area-inset-right));
   padding-bottom: 10px;
   padding-left: max(14px, env(safe-area-inset-left));
-  /* Fully opaque so each page's body background can't bleed through
-     and tint the bar a different color. Matches the dashboard's base
-     dark background so the bar feels continuous with the page chrome. */
-  background: #0a0a0b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  background: var(--divine-surface, #0C0C0D);
+  border-bottom: 1px solid var(--divine-border, rgba(255,255,255,0.09));
+  box-shadow: 0 2px 16px rgba(0,0,0,0.4);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 .topbar-pill {
   flex: 1 1 0; min-width: 0;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--divine-pill-bg, rgba(255,255,255,0.04));
+  border: 1px solid var(--divine-pill-border, rgba(255,255,255,0.07));
   border-radius: 11px;
   text-decoration: none;
-  color: #FAFAFA;
+  color: var(--divine-text-1, #FAFAFA);
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.topbar-pill:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.10); }
+.topbar-pill:hover {
+  background: var(--divine-accent-dim, rgba(255,255,255,0.07));
+  border-color: rgba(245,197,24,0.25);
+}
 .topbar-pill-dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: #6ee7b7; flex-shrink: 0;
+  transition: background 0.2s;
 }
 .topbar-pill.warn .topbar-pill-dot { background: #fbbf24; }
 .topbar-pill.miss .topbar-pill-dot {
@@ -62,15 +89,15 @@
 }
 .topbar-pill-label {
   font-size: 10px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--divine-text-2, rgba(255,255,255,0.5));
   flex-shrink: 0;
 }
 .topbar-pill-count {
   margin-left: auto;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 12px; font-weight: 700;
-  color: #FAFAFA;
+  color: var(--divine-text-1, #FAFAFA);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -87,7 +114,7 @@
   border-right: none;
   border-radius: 11px 0 0 11px;
   text-decoration: none;
-  color: #FAFAFA;
+  color: var(--divine-text-1, #FAFAFA);
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
 }
@@ -113,6 +140,60 @@
   background: linear-gradient(180deg, rgba(125, 211, 252, 0.65), rgba(110, 231, 183, 0.65));
 }
 
+/* ── Divine brand ────────────────────────────────────────── */
+.topbar-brand {
+  display: flex; align-items: center; gap: 6px;
+  text-decoration: none; flex-shrink: 0;
+  padding: 5px 8px 5px 4px;
+  margin-right: 2px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.topbar-brand:hover { background: var(--divine-accent-dim, rgba(245,197,24,0.12)); }
+.topbar-star {
+  width: 17px; height: 17px;
+  fill: var(--divine-accent, #F5C518);
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 5px rgba(245,197,24,0.4));
+  transition: fill 0.25s;
+}
+.topbar-name {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--divine-accent, #F5C518);
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+
+/* ── Theme toggle ────────────────────────────────────────── */
+.topbar-theme-btn {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border: 1px solid var(--divine-border, rgba(255,255,255,0.09));
+  border-radius: 9px;
+  background: transparent;
+  color: var(--divine-text-2, rgba(250,250,250,0.65));
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: 2px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.topbar-theme-btn:hover {
+  background: var(--divine-accent-dim, rgba(245,197,24,0.12));
+  border-color: var(--divine-accent, #F5C518);
+  color: var(--divine-accent, #F5C518);
+}
+
+/* ── Active pill (current page) ──────────────────────────── */
+.topbar-pill.is-active {
+  background: var(--divine-accent-dim, rgba(245,197,24,0.12));
+  border-color: rgba(245,197,24,0.3);
+}
+.topbar-pill.is-active .topbar-pill-dot { background: var(--divine-accent, #F5C518); }
+.topbar-pill.is-active .topbar-pill-label,
+.topbar-pill.is-active .topbar-pill-count { color: var(--divine-accent, #F5C518); }
+
 @media (max-width: 480px) {
   .topbar { padding-top: max(52px, env(safe-area-inset-top)); padding-left: max(6px, env(safe-area-inset-left)); padding-right: max(6px, env(safe-area-inset-right)); gap: 3px; }
   .topbar-pill, .topbar-water-pill { padding: 5px 6px; gap: 4px; overflow: hidden; }
@@ -121,16 +202,12 @@
   .topbar-water-pill .topbar-pill-label { display: none; }
   .topbar-water-pill .topbar-pill-count { display: none; }
   .topbar-water-add { width: 30px; font-size: 15px; }
+  .topbar-name { display: none; }
+  .topbar-brand { padding: 5px 4px; margin-right: 0; }
+  .topbar-theme-btn { width: 28px; height: 28px; margin-left: 1px; }
 }
 
-/* === Global mobile lockdown ===
-   1) Hide the right-side scrollbar on phones (iOS uses overlay scrollbars anyway).
-   2) Stop iOS auto-text-size-adjust.
-   3) touch-action: pan-y prevents pinch-zoom while still allowing vertical scroll.
-   4) overscroll-behavior on every common modal class stops scroll chaining —
-      scrolling inside a settings popup won't drag the page behind it.
-   5) When body has .topbar-modal-open, the page can't scroll at all (locked).
-*/
+/* === Global mobile lockdown === */
 html, body {
   -webkit-text-size-adjust: 100%;
 }
@@ -146,9 +223,6 @@ body.topbar-modal-open {
   overflow: hidden;
   touch-action: none;
 }
-/* On phones, blow the modals up to full screen and let them be the only
-   scrolling element. Way less "is this scrolling the page or the modal?"
-   confusion. */
 @media (max-width: 480px) {
   .modal-bg, .po-modal-bg {
     padding: 0 !important;
@@ -172,32 +246,37 @@ body.topbar-modal-open {
   // -------- HTML --------
   const html = `
 <header class="topbar" id="topbar" role="navigation" aria-label="Quick stats">
+  <a href="index.html" class="topbar-brand" aria-label="Divine home">
+    <svg class="topbar-star" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1L14.5 9.5L23 12L14.5 14.5L12 23L9.5 14.5L1 12L9.5 9.5Z"/></svg>
+    <span class="topbar-name">Divine</span>
+  </a>
   <a href="index.html" class="topbar-pill" id="topbarGoals">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">GOALS</span>
+    <span class="topbar-pill-label">Goals</span>
     <span class="topbar-pill-count" id="topbarGoalsCount">—/—</span>
   </a>
   <a href="health.html" class="topbar-pill" id="topbarStack">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">STACK</span>
+    <span class="topbar-pill-label">Stack</span>
     <span class="topbar-pill-count" id="topbarStackCount">—/—</span>
   </a>
   <div class="topbar-water-wrap">
     <a href="health.html#water" class="topbar-water-pill" id="topbarWater">
       <span class="topbar-pill-dot"></span>
-      <span class="topbar-pill-label">WATER</span>
+      <span class="topbar-pill-label">Water</span>
       <span class="topbar-pill-count" id="topbarWaterCount">—/—</span>
     </a>
     <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
   </div>
   <a href="gym.html" class="topbar-pill" id="topbarGym">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">GYM</span>
+    <span class="topbar-pill-label">Gym</span>
   </a>
   <a href="finance.html" class="topbar-pill" id="topbarFinance">
     <span class="topbar-pill-dot"></span>
-    <span class="topbar-pill-label">FINANCE</span>
+    <span class="topbar-pill-label">Finance</span>
   </a>
+  <button class="topbar-theme-btn" id="topbarThemeToggle" type="button" aria-label="Toggle theme"></button>
 </header>
 `;
 
@@ -211,6 +290,40 @@ body.topbar-modal-open {
     const wrap = document.createElement('div');
     wrap.innerHTML = html.trim();
     document.body.insertBefore(wrap.firstChild, document.body.firstChild);
+  }
+
+  // -------- Theme --------
+  function _divineApplyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('divine-theme', theme); } catch(e) {}
+    const btn = document.getElementById('topbarThemeToggle');
+    if (!btn) return;
+    const isDark = theme !== 'light';
+    btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    btn.innerHTML = isDark
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  function _divineSetupTheme() {
+    let saved = 'dark';
+    try { saved = localStorage.getItem('divine-theme') || 'dark'; } catch(e) {}
+    _divineApplyTheme(saved);
+    const btn = document.getElementById('topbarThemeToggle');
+    if (btn) btn.addEventListener('click', function() {
+      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      _divineApplyTheme(next);
+    });
+  }
+  function _divineMarkActive() {
+    const path = window.location.pathname;
+    const map = { topbarGoals: 'index', topbarStack: 'health', topbarGym: 'gym', topbarFinance: 'finance' };
+    Object.keys(map).forEach(function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const key = map[id];
+      const isHome = key === 'index' && (path === '/' || path.endsWith('/') || path.endsWith('index.html'));
+      el.classList.toggle('is-active', isHome || (!isHome && path.includes('/' + key)));
+    });
   }
 
   // -------- Active-date helpers (match the goals page 6 AM rollover) --------
@@ -281,7 +394,6 @@ body.topbar-modal-open {
     if (total === 0) return 'idle';
     if (done >= total) return 'good';
     if (done >= total * 0.5) return 'warn';
-    // Past 6pm and still under half → flag as missed
     const h = new Date().getHours();
     if (h >= 18 && done < total * 0.5) return 'miss';
     return 'warn';
@@ -296,7 +408,7 @@ body.topbar-modal-open {
     const goalsEl = document.getElementById('topbarGoals');
     const stackEl = document.getElementById('topbarStack');
     const waterEl = document.getElementById('topbarWater');
-    if (!goalsEl) return; // not injected yet
+    if (!goalsEl) return;
 
     const g = getGoalsProgress();
     const s = getStackProgress();
@@ -324,8 +436,6 @@ body.topbar-modal-open {
   }
 
   async function pushWaterMergedToSupabase(localWater) {
-    // Only do this when we're NOT on the health page — health page
-    // has its own sync that already detects the localStorage change.
     if (window.location.pathname.endsWith('/health.html') ||
         window.location.pathname.endsWith('health.html')) return;
 
@@ -342,7 +452,7 @@ body.topbar-modal-open {
         { key: 'health', data: merged, updated_at: new Date().toISOString() },
         { onConflict: 'key' }
       );
-    } catch (e) { /* offline — local change will sync next time user visits health */ }
+    } catch (e) {}
   }
 
   function addWater() {
@@ -365,14 +475,11 @@ body.topbar-modal-open {
   }
 
   // -------- Mobile lockdown helpers --------
-  // Belt-and-suspenders zoom prevention — iOS Safari sometimes ignores
-  // user-scalable=no, so we also kill the gesture events directly.
   function blockGesture(e) { e.preventDefault(); }
   function lockGestures() {
     document.addEventListener('gesturestart', blockGesture, { passive: false });
     document.addEventListener('gesturechange', blockGesture, { passive: false });
     document.addEventListener('gestureend', blockGesture, { passive: false });
-    // Also kill the iOS double-tap-to-zoom on any tap.
     let lastTouch = 0;
     document.addEventListener('touchend', (e) => {
       const now = Date.now();
@@ -381,9 +488,6 @@ body.topbar-modal-open {
     }, { passive: false });
   }
 
-  // Watch every known modal-bg / overlay class — when any one of them
-  // gets `.show` or `.is-open`, lock the body scroll. When the last
-  // one closes, unlock.
   function startModalLock() {
     const MODAL_SELECTORS = [
       '.modal-bg', '.po-modal-bg', '.wt-overlay', '.wt-viewer', '.wt-cam'
@@ -403,8 +507,6 @@ body.topbar-modal-open {
       document.body.classList.toggle('topbar-modal-open', anyOpen());
     }
     const observer = new MutationObserver(sync);
-    // Observe class changes anywhere in body — modal toggles are rare so
-    // a global subtree observer is cheap.
     observer.observe(document.body, {
       attributes: true, attributeFilter: ['class'], subtree: true
     });
@@ -414,19 +516,18 @@ body.topbar-modal-open {
   // -------- Boot --------
   function boot() {
     injectStyleAndHTML();
+    _divineSetupTheme();
+    _divineMarkActive();
     const btn = document.getElementById('topbarWaterAdd');
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
     lockGestures();
     startModalLock();
 
-    // Re-render when localStorage changes from another tab/window OR when
-    // the page becomes visible (sync may have pulled in the background).
     window.addEventListener('storage', render);
     window.addEventListener('focus', render);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
 
-    // Periodic refresh so counts stay current after midnight rollover etc.
     setInterval(render, 30 * 1000);
   }
 

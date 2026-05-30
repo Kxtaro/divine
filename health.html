@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#050506">
 <meta name="color-scheme" content="dark">
 <title>Daily Stack — Customizable Template</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('divine-theme')||'dark')}catch(e){}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="sync.js" defer></script>
 <script src="topbar.js" defer></script>
@@ -450,6 +451,20 @@ main {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+/* ── Light mode ────────────────────────────────────────── */
+html[data-theme="light"] body::before, html[data-theme="light"] body::after { opacity: 0.15; }
+html[data-theme="light"] main { background: transparent; }
+html[data-theme="light"] .stack-card {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+html[data-theme="light"] .stack-item { border-color: rgba(0,0,0,0.07); }
+html[data-theme="light"] .stack-item-name { color: #0A0A0B; }
+html[data-theme="light"] .section-title { color: rgba(10,10,11,0.38); }
+html[data-theme="light"] .stack-window-header { color: rgba(10,10,11,0.38); border-color: rgba(0,0,0,0.07); }
+html[data-theme="light"] .stack-ticker { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.07); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
 </style>
 </head>
 <body>
