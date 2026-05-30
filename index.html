@@ -34,7 +34,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: clip;
-  padding: 0 max(20px, env(safe-area-inset-right)) 60px max(20px, env(safe-area-inset-left));
+  padding: 0 0 max(60px, env(safe-area-inset-bottom)) 0;
 }
 body::before {
   content: '';
@@ -63,6 +63,7 @@ body::after {
 .page {
   max-width: 1100px;
   margin: 0 auto;
+  padding: 24px max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
 }
 
 /* ===== Component 1: page title ===== */
@@ -589,7 +590,8 @@ body::after {
 .gm-status.gm-status-error { color: var(--danger); }
 
 @media (max-width: 480px) {
-  body { padding: 0 max(14px, env(safe-area-inset-right)) 50px max(14px, env(safe-area-inset-left)); }
+  body { padding-bottom: max(50px, env(safe-area-inset-bottom)); }
+  .page { padding: 16px max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
   .gm-card { padding: 16px; }
   .gm-progress-num { font-size: 36px; }
 }
