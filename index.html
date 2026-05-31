@@ -653,6 +653,21 @@ html[data-theme="dark"] .gm-progress-bar-fill { background: linear-gradient(90de
 html[data-theme="light"] { --text-primary:#1A1408; --text-secondary:rgba(26,20,8,0.76); --text-tertiary:rgba(26,20,8,0.52); }
 html[data-theme="light"] .gm-card { background:#FFFFFF; border:1px solid rgba(26,20,8,0.10); box-shadow:0 2px 14px rgba(26,20,8,0.08); }
 html[data-theme="light"] .gm-progress-bar-fill { background: linear-gradient(90deg,#C8940A,#9A7400) !important; }
+/* light-mode contrast: day ring track + buttons + inputs */
+html[data-theme="light"] .day-progress-track { stroke: rgba(28,22,8,0.16) !important; }
+html[data-theme="light"] .gm-add-btn, html[data-theme="light"] .gm-fab {
+  background: linear-gradient(180deg,#E7B23E,#B8860B) !important; color:#1C1608 !important;
+  border:1px solid rgba(28,22,8,0.18) !important; box-shadow:0 2px 9px rgba(184,134,11,0.32) !important;
+}
+html[data-theme="light"] .gm-input { background:#FFFFFF !important; border:1px solid rgba(28,22,8,0.22) !important; color:#1A1408 !important; }
+html[data-theme="light"] .gm-input::placeholder { color: rgba(28,22,8,0.42) !important; }
+html[data-theme="light"] .gm-tab { color: rgba(28,22,8,0.55) !important; }
+html[data-theme="light"] .gm-tab.is-active, html[data-theme="light"] .gm-tab.active { color:#1A1408 !important; border-color: rgba(184,134,11,0.55) !important; }
+html[data-theme="light"] .gm-cancel-btn, html[data-theme="light"] .gm-tomorrow-toggle {
+  color: rgba(28,22,8,0.62) !important; border:1px solid rgba(28,22,8,0.2) !important; background: rgba(28,22,8,0.03) !important;
+}
+html[data-theme="light"] .gm-add-hint { color: rgba(28,22,8,0.5) !important; }
+html[data-theme="light"] .gm-check { border-color: rgba(28,22,8,0.28) !important; }
 </style>
 </head>
 <body>
