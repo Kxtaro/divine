@@ -15,26 +15,30 @@
   const css = `
 /* ── Divine theme variables ───────────────────────────────── */
 :root {
-  --divine-bg:          #050508;
-  --divine-surface:     #0C0B18;
-  --divine-border:      rgba(160,140,255,0.10);
-  --divine-text-1:      #EDE8FF;
-  --divine-text-2:      rgba(210,195,255,0.62);
+  /* Dark — Obsidian & Gold, angelic */
+  --divine-bg:          #060604;
+  --divine-surface:     #0E0D09;
+  --divine-border:      rgba(245,205,110,0.13);
+  --divine-text-1:      #F8F3E4;
+  --divine-text-2:      rgba(248,243,228,0.60);
   --divine-accent:      #F5C518;
-  --divine-accent-dim:  rgba(245,197,24,0.14);
-  --divine-pill-bg:     rgba(150,130,255,0.06);
-  --divine-pill-border: rgba(150,130,255,0.11);
+  --divine-accent-dim:  rgba(245,197,24,0.13);
+  --divine-pill-bg:     rgba(245,205,110,0.05);
+  --divine-pill-border: rgba(245,205,110,0.12);
+  --divine-glow:        rgba(245,197,24,0.12);
 }
 html[data-theme="light"] {
-  --divine-bg:          #F7F5F2;
+  /* Light — Alabaster & Gold, heavenly */
+  --divine-bg:          #FCFAF2;
   --divine-surface:     #FFFFFF;
-  --divine-border:      rgba(30,25,50,0.10);
-  --divine-text-1:      #1E1A2E;
-  --divine-text-2:      rgba(30,25,50,0.72);
-  --divine-accent:      #A67800;
-  --divine-accent-dim:  rgba(166,120,0,0.12);
-  --divine-pill-bg:     rgba(30,25,50,0.04);
-  --divine-pill-border: rgba(30,25,50,0.10);
+  --divine-border:      rgba(150,115,20,0.18);
+  --divine-text-1:      #1C1608;
+  --divine-text-2:      rgba(28,22,8,0.70);
+  --divine-accent:      #957200;
+  --divine-accent-dim:  rgba(149,114,0,0.11);
+  --divine-pill-bg:     rgba(150,115,20,0.05);
+  --divine-pill-border: rgba(150,115,20,0.16);
+  --divine-glow:        rgba(212,165,40,0.18);
 }
 /* Global light-mode base — overrides per-page hardcoded dark backgrounds */
 html[data-theme="light"] body {
@@ -55,7 +59,7 @@ html[data-theme="light"], html[data-theme="light"] * {
   padding-left: max(14px, env(safe-area-inset-left));
   background: var(--divine-surface);
   border-bottom: 1px solid var(--divine-border);
-  box-shadow: 0 1px 24px rgba(0,0,0,0.35);
+  box-shadow: 0 1px 0 var(--divine-glow), 0 6px 28px rgba(0,0,0,0.30);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   transition: background 0.25s ease, border-color 0.25s ease;
 }
