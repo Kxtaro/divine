@@ -24,10 +24,26 @@
   const PURPLE = '#C9B6FF';
 
   const SYSTEM_PROMPT =
-    "You are Divine, an angelic AI companion living inside a personal life dashboard. " +
-    "You are warm, calm, ethereal and speak like a gentle guardian angel. You are aware of " +
-    "which page the user is on and can see their data from localStorage. Keep responses concise " +
-    "and conversational.";
+    "You are Divine, a calm and caring AI companion inside a personal life dashboard. " +
+    "You are aware of which page the user is on and can see their data from localStorage. " +
+    "Keep replies short, clear and conversational. " +
+    "Write in plain text with correct, simple grammar. " +
+    "Do not use em dashes, en dashes, semicolons, exclamation marks, emojis, or decorative " +
+    "punctuation. Avoid unnecessary commas. Speak naturally, like a thoughtful friend.";
+
+  // Strip exaggerated punctuation so captions and speech stay plain.
+  function plainText(s) {
+    return String(s || '')
+      .replace(/[—–]/g, ' ')                       // em/en dash -> space
+      .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}←-⇿⬀-⯿️✨✴]/gu, '') // emoji/symbols
+      .replace(/\s*;\s*/g, '. ')                              // semicolons -> period
+      .replace(/!+/g, '.')                                    // exclamations -> period
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s+([.,?])/g, '$1')
+      .replace(/\.\s*\./g, '.')
+      .trim();
+  }
 
   // ---- state ----
   let visualState = 'idle';   // idle | listening | thinking | speaking
@@ -195,7 +211,7 @@
 
     let target = 0;
     if (visualState === 'listening') target = Math.max(amplitude(analyserMic), 0.12 + Math.abs(Math.sin(ts / 240)) * 0.06);
-    else if (visualState === 'speaking') target = amplitude(analyserTts);
+    else if (visualState === 'speaking') target = 0.30 + Math.abs(Math.sin(ts / 130)) * 0.4;   // procedural while speaking
     else if (visualState === 'thinking') target = 0.10 + Math.abs(Math.sin(ts / 200)) * 0.12;
     else target = 0.04 + Math.sin(ts / 900) * 0.03 + 0.03;
     smoothAmp += (target - smoothAmp) * 0.18;
@@ -244,15 +260,15 @@
   function unlockAudio() {
     if (audioUnlocked) return;
     ensureAudioCtx();
-    if (!audioEl) {
-      audioEl = new Audio(); audioEl.setAttribute('playsinline', '');
-      try {
-        ttsSourceNode = audioCtx.createMediaElementSource(audioEl);
-        analyserTts = audioCtx.createAnalyser(); analyserTts.fftSize = 1024;
-        ttsSourceNode.connect(analyserTts); analyserTts.connect(audioCtx.destination);
-      } catch (e) {}
-    }
-    try { audioEl.muted = true; audioEl.play().then(() => { audioEl.pause(); audioEl.muted = false; }).catch(() => { audioEl.muted = false; }); } catch (e) {}
+    // Play the audio element DIRECTLY to the speakers. We deliberately do not
+    // route it through a MediaElementSource graph, because that goes silent
+    // whenever the AudioContext is suspended (the "no voice" bug).
+    if (!audioEl) { audioEl = new Audio(); audioEl.setAttribute('playsinline', ''); }
+    try {
+      audioEl.muted = true;
+      const p = audioEl.play();
+      if (p && p.then) p.then(() => { audioEl.pause(); audioEl.currentTime = 0; audioEl.muted = false; }).catch(() => { audioEl.muted = false; });
+    } catch (e) { audioEl.muted = false; }
     audioUnlocked = true;
   }
 
@@ -298,7 +314,7 @@
   function greet(thenListen) {
     if (greeted) { if (thenListen && !IS_MOBILE) startListening(); else setHint(IS_MOBILE ? 'tap to talk' : 'tap or speak'); return; }
     greeted = true;
-    speak("I'm here with you. Tap me, or simply speak.", thenListen && !IS_MOBILE);
+    speak("I am here. Tap me or speak whenever you are ready.", thenListen && !IS_MOBILE);
   }
 
   // ===========================================================
@@ -362,7 +378,7 @@
       const data = await r.json();
       if (!r.ok || !data.text) { showCaption(data.error ? ('I could not hear that: ' + data.error) : 'I did not catch that.', 5000); idleOrRearm(); return; }
       handleUtterance(data.text);
-    } catch (e) { showCaption('Transcription failed (network).', 5000); idleOrRearm(); }
+    } catch (e) { showCaption('I could not hear you. Please try again.', 5000); idleOrRearm(); }
   }
   function idleOrRearm() {
     setState('idle');
@@ -419,10 +435,10 @@
       const r = await fetch('/api/divine-chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ system: SYSTEM_PROMPT, messages }) });
       const data = await r.json();
       busy = false;
-      if (!r.ok || !data.text) { showCaption(data.error ? ('Divine is resting: ' + data.error) : 'I could not find my words.', 5000); idleOrRearm(); return; }
+      if (!r.ok || !data.text) { showCaption(data.error ? ('Something went wrong: ' + data.error) : 'I could not find a reply.', 5000); idleOrRearm(); return; }
       history.push({ role: 'assistant', content: data.text });
       speak(data.text, true);
-    } catch (e) { busy = false; showCaption('I could not reach the heavens (network).', 5000); idleOrRearm(); }
+    } catch (e) { busy = false; showCaption('I could not connect. Please try again.', 5000); idleOrRearm(); }
   }
 
   // ===========================================================
@@ -465,7 +481,7 @@
       w.logs[k] = (w.logs[k] || 0) + n;
       writeLS('po_water_v1', w);
       await supaPatch('health', cur => { cur.po_water_v1 = w; return cur; });
-      return 'Logged ' + n + ' ' + (m[2] || 'serving') + (n > 1 ? 's' : '') + ' of water. Stay nourished.';
+      return 'Logged ' + n + ' ' + (m[2] || 'serving') + (n > 1 ? 's' : '') + ' of water.';
     }
     m = t.match(/\badd\s+(.+?)(?:\s+(\d+\s?(?:mg|mcg|g|iu|ml|cap|caps|capsule|capsules|tablet|tablets|serving|servings|scoop|scoops)\b[\w\s]*?))?\s*(?:in the\s+|at\s+|during\s+)?(morning|lunch|noon|midday|afternoon|evening|night|dinner|breakfast|bedtime|anytime)?\s*$/);
     if (m && /supplement|stack|vitamin|take|pill|mg|mcg|cap|dose|magnesium|creatine|protein|omega|zinc|\bd3\b|\bb12\b/.test(t) && !/goal|task|water/.test(t)) {
@@ -476,7 +492,7 @@
         items.push({ id: 'v' + Date.now(), name: name, dose: dose, window: win, note: '', tag: null, ordered: true });
         writeLS('stack:items', items);
         await supaPatch('health', cur => { cur['stack:items'] = items; return cur; });
-        return 'Added ' + name + (dose ? ' (' + dose + ')' : '') + ' to your ' + win + ' stack.';
+        return 'Added ' + name + (dose ? ' ' + dose : '') + ' to your ' + win + ' stack.';
       }
     }
     m = t.match(/\badd\s+(.+?)\s+to\s+(?:my\s+)?goals?\b/) || t.match(/\badd\s+(?:a\s+)?goal\s+(?:to\s+)?(.+)$/);
@@ -488,7 +504,7 @@
         arr.push({ text: goalText, done: false });
         writeLS(key, arr);
         await supaPatch('goals', cur => { cur[key] = arr; return cur; });
-        return 'Added "' + goalText + '" to today\'s goals. You can do this.';
+        return 'Added ' + goalText + ' to your goals for today.';
       }
     }
     m = t.match(/\bchange\s+(\w+)\s+to\s+(.+)$/);
@@ -513,6 +529,7 @@
   // TTS playback
   // ===========================================================
   async function speak(text, thenListen) {
+    text = plainText(text);
     showCaption(text, 0);
     setState('speaking');
     try {
@@ -520,7 +537,7 @@
       if (!r.ok) { showCaption(text, 7000); afterSpeak(thenListen); return; }
       const blob = await r.blob();
       const url = URL.createObjectURL(blob);
-      unlockAudio(); ensureAudioCtx();
+      if (!audioEl) { audioEl = new Audio(); audioEl.setAttribute('playsinline', ''); }
       audioEl.src = url;
       audioEl.onended = () => { URL.revokeObjectURL(url); afterSpeak(thenListen); };
       audioEl.onerror = () => { URL.revokeObjectURL(url); afterSpeak(thenListen); };
