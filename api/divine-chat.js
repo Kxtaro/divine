@@ -16,9 +16,9 @@ module.exports = async (req, res) => {
     if (typeof body === 'string') body = JSON.parse(body || '{}');
     const { system, messages } = body || {};
     if (!Array.isArray(messages) || !messages.length) { res.status(400).json({ error: 'messages[] required' }); return; }
-    // If "claude-opus-4-5" 404s on your account, set DIVINE_MODEL to a
-    // current id (e.g. claude-opus-4-8) in Vercel — no code change needed.
-    const model = process.env.DIVINE_MODEL || 'claude-opus-4-5';
+    // Default to the latest Sonnet (fast, capable, cheaper than Opus).
+    // Override per deploy with DIVINE_MODEL in Vercel — no code change needed.
+    const model = process.env.DIVINE_MODEL || 'claude-sonnet-4-6';
 
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
