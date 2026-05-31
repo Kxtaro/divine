@@ -107,6 +107,7 @@ html[data-theme="light"], html[data-theme="light"] * {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.topbar-water-pill .topbar-pill-dot { background: #7DD3FC; }
 .topbar-label-short { display: none; }
 .topbar-label-emoji { display: none; font-size: 15px; line-height: 1; }
 
@@ -224,6 +225,12 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     <span class="topbar-pill-label topbar-label-emoji">💊</span>
     <span class="topbar-pill-count" id="topbarStackCount">—/—</span>
   </a>
+  <a href="po-water.html" class="topbar-pill topbar-water-pill" id="topbarWater">
+    <span class="topbar-pill-dot"></span>
+    <span class="topbar-pill-label topbar-label-full">Water</span>
+    <span class="topbar-pill-label topbar-label-emoji">💧</span>
+    <span class="topbar-pill-count" id="topbarWaterCount">—/—</span>
+  </a>
   <a href="gym.html" class="topbar-pill" id="topbarGym">
     <span class="topbar-pill-dot"></span>
     <span class="topbar-pill-label topbar-label-full">Gym</span>
@@ -273,7 +280,7 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
   }
   function _divineMarkActive() {
     const path = window.location.pathname;
-    const map = { topbarGoals: 'index', topbarStack: 'health', topbarGym: 'gym', topbarFinance: 'finance' };
+    const map = { topbarGoals: 'index', topbarStack: 'health', topbarWater: 'po-water', topbarGym: 'gym', topbarFinance: 'finance' };
     Object.keys(map).forEach(function(id) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -310,6 +317,30 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     const done = total ? items.filter(i => i && taken[i.id]).length : 0;
     return { done, total };
   }
+  function calendarDateKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+  function getWaterProgress() {
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem('po_water_v1')); } catch (e) {}
+    if (!state) return { done: 0, total: 0 };
+    const done = (state.logs || {})[calendarDateKey()] || 0;
+    const p = state.profile || { weightKg: 75 };
+    const wKg = state.weightUnit === 'lb' ? (p.weightKg || 0) / 2.20462 : (p.weightKg || 0);
+    const base = wKg * 35;
+    const exercise = (p.activityHrsPerWeek || 0) / 7 * 500;
+    const totalMl = base + exercise + (p.sex === 'm' ? 200 : 0);
+    let unitVol;
+    if (state.unit === 'glass') unitVol = state.glassMl || 250;
+    else if (state.unit === 'oz') unitVol = 30;
+    else if (state.unit === 'ml') unitVol = 1;
+    else unitVol = state.bottleMl || 500;
+    const total = Math.max(1, Math.ceil(totalMl / unitVol));
+    return { done, total };
+  }
 
   function classifyStatus(done, total) {
     if (total === 0) return 'idle';
@@ -329,12 +360,16 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     if (!goalsEl) return;
     const g = getGoalsProgress();
     const s = getStackProgress();
+    const w = getWaterProgress();
     const gc = document.getElementById('topbarGoalsCount');
     const sc = document.getElementById('topbarStackCount');
+    const wc = document.getElementById('topbarWaterCount');
     if (gc) gc.textContent = g.total ? g.done + '/' + g.total : '—';
     if (sc) sc.textContent = s.total ? s.done + '/' + s.total : '—';
+    if (wc) wc.textContent = w.total ? w.done + '/' + w.total : '—';
     setPillStatus(goalsEl, classifyStatus(g.done, g.total));
     setPillStatus(document.getElementById('topbarStack'), classifyStatus(s.done, s.total));
+    setPillStatus(document.getElementById('topbarWater'), classifyStatus(w.done, w.total));
   }
 
   // -------- Modal scroll lock --------

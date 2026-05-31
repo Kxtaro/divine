@@ -491,6 +491,21 @@ html[data-theme="light"] .stack-check { border-color: rgba(28,22,8,0.18); }
 html[data-theme="light"] .stack-input { background: rgba(255,255,255,0.95); border-color: rgba(28,22,8,0.14); color: #1C1608; }
 html[data-theme="light"] .stack-input::placeholder { color: rgba(28,22,8,0.38); }
 html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(28,22,8,0.14); }
+
+/* ════ Divine angelic polish ════ */
+html[data-theme="dark"] {
+  --text-primary:#F4EEDD; --text-secondary:rgba(244,238,221,0.68); --text-tertiary:rgba(244,238,221,0.46);
+  --accent:#F5C518; --accent-glow:rgba(245,197,24,0.30); --tag-stack:#F5C518;
+}
+html[data-theme="dark"] .stack-card { border:1px solid rgba(245,205,110,0.14); box-shadow: inset 0 1px 0 rgba(245,205,110,0.06), 0 20px 50px rgba(0,0,0,0.55); }
+html[data-theme="dark"] .section-title { color: rgba(245,197,24,0.62); }
+html[data-theme="dark"] .stack-check.is-checked, html[data-theme="dark"] .stack-check[aria-checked="true"] { background:#F5C518 !important; border-color:#F5C518 !important; color:#1C1608 !important; }
+/* light contrast hardening */
+html[data-theme="light"] {
+  --text-primary:#1A1408; --text-secondary:rgba(26,20,8,0.76); --text-tertiary:rgba(26,20,8,0.52);
+  --accent:#9A7400; --accent-glow:rgba(154,116,0,0.18); --tag-stack:#9A7400;
+}
+html[data-theme="light"] .stack-card { background:#FFFFFF; border:1px solid rgba(26,20,8,0.10); box-shadow:0 2px 14px rgba(26,20,8,0.08); }
 </style>
 </head>
 <body>
