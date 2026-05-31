@@ -361,10 +361,21 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     _divineMarkActive();
     render();
     startModalLock();
+    loadDivineCompanion();
     window.addEventListener('storage', render);
     window.addEventListener('focus', render);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
     setInterval(render, 30 * 1000);
+  }
+
+  // Load the Divine AI voice companion (orb + mic) on every page.
+  function loadDivineCompanion() {
+    if (window.__divineCompanion || document.getElementById('divine-companion-js')) return;
+    const s = document.createElement('script');
+    s.id = 'divine-companion-js';
+    s.src = 'divine-companion.js';
+    s.defer = true;
+    document.body.appendChild(s);
   }
 
   if (document.readyState === 'loading') {
