@@ -487,6 +487,13 @@ html[data-theme="light"] .card { background:#FFFFFF !important; border:1px solid
 html[data-theme="light"] .btn-primary { background: linear-gradient(180deg,#E7B23E,#B8860B) !important; color:#1C1608 !important; border:none !important; }
 html[data-theme="light"] .water-plus-btn, html[data-theme="light"] .water-minus-btn { color:#1A1408 !important; border:1px solid rgba(28,22,8,0.22) !important; background: rgba(28,22,8,0.05) !important; }
 html[data-theme="light"] input, html[data-theme="light"] select { background:#FFFFFF !important; border:1px solid rgba(28,22,8,0.22) !important; color:#1A1408 !important; }
+/* exact-amount water logger */
+.water-log-exact { display:flex; gap:8px; margin-top:14px; }
+.water-log-exact input { flex:1; min-width:0; padding:10px 12px; border-radius:11px; border:1px solid var(--border, rgba(255,255,255,0.14)); background: rgba(255,255,255,0.04); color: var(--text-1); font-family:inherit; font-size:15px; }
+.water-log-exact select { padding:10px 8px; border-radius:11px; border:1px solid var(--border, rgba(255,255,255,0.14)); background: rgba(255,255,255,0.04); color: var(--text-1); font-family:inherit; font-size:13px; cursor:pointer; }
+.water-exact-btn { padding:10px 15px; border-radius:11px; border:none; background: linear-gradient(180deg,#FFE27A,var(--divine-accent,#F5C518)); color:#1C1608; font-weight:700; font-family:inherit; font-size:14px; cursor:pointer; white-space:nowrap; -webkit-tap-highlight-color:transparent; }
+.water-exact-btn:active { transform: scale(0.96); }
+.water-exact-total { margin-top:9px; font-size:12.5px; color: var(--text-2, rgba(255,255,255,0.6)); text-align:center; font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
@@ -534,6 +541,19 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
       </button>
     </div>
     <div class="water-helper" id="waterHelper">Start the day — first one in.</div>
+
+    <div class="water-log-exact">
+      <input type="number" id="waterExactInput" inputmode="decimal" min="1" step="10" placeholder="Exact amount">
+      <select id="waterExactUnit" aria-label="Measurement">
+        <option value="ml">mL</option>
+        <option value="oz">oz</option>
+        <option value="glass">glass</option>
+        <option value="bottle">bottle</option>
+        <option value="L">L</option>
+      </select>
+      <button type="button" id="waterExactBtn" class="water-exact-btn">+ Log</button>
+    </div>
+    <div class="water-exact-total" id="waterExactTotal"></div>
 
     <button class="why-toggle" id="whyToggle" type="button" aria-expanded="false">
       <span>Why this target?</span>
@@ -751,7 +771,7 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
   function setTodayCount(n) {
     const k = todayKey();
     if (n <= 0) delete state.logs[k];
-    else state.logs[k] = n;
+    else state.logs[k] = Math.round(n * 100) / 100;   // keep fractional servings clean
     saveState();
   }
 
@@ -802,6 +822,14 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
     if (ml >= 1000) return (ml / 1000).toFixed(1) + ' L';
     return Math.round(ml) + ' ml';
   }
+  function fmtCount(n) { return Number.isInteger(n) ? String(n) : (Math.round(n * 10) / 10).toFixed(1); }
+  function measureToMl(amount, measure) {
+    if (measure === 'oz') return amount * 29.5735;
+    if (measure === 'glass') return amount * (state.glassMl || 250);
+    if (measure === 'bottle') return amount * (state.bottleMl || 500);
+    if (measure === 'L') return amount * 1000;
+    return amount;   // ml
+  }
 
   // ============================================================
   // RENDER
@@ -820,7 +848,7 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
     const unitName = unitLabelPlural();
 
     $('waterUnitLabel').textContent = unitName.toUpperCase() + ' DRANK TODAY';
-    $('waterNum').textContent = count;
+    $('waterNum').textContent = fmtCount(count);
     $('waterTarget').textContent = '/ ' + targetUnits;
     $('waterPlusLabel').textContent = 'Drank a ' + unitLabelSingular();
 
@@ -940,6 +968,18 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
     setTodayCount(Math.max(0, todayCount() - 1));
     renderWater();
   });
+  function logExactAmount() {
+    const amt = parseFloat($('waterExactInput').value);
+    if (!amt || amt <= 0) return;
+    const ml = measureToMl(amt, $('waterExactUnit').value);
+    setTodayCount(todayCount() + ml / unitVolMl());   // convert to fractional servings
+    $('waterExactInput').value = '';
+    renderWater();
+    const btn = $('waterExactBtn');
+    if (btn) { btn.classList.add('flash'); setTimeout(() => btn.classList.remove('flash'), 200); }
+  }
+  $('waterExactBtn').addEventListener('click', logExactAmount);
+  $('waterExactInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') logExactAmount(); });
 
   $('whyToggle').addEventListener('click', () => {
     const body = $('whyBody');
