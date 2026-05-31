@@ -875,6 +875,10 @@ html[data-theme="light"] input, html[data-theme="light"] select { background:#FF
     // Disable minus when at zero
     $('waterMinusBtn').disabled = count <= 0;
 
+    // Precise mL total vs target
+    const exTotal = $('waterExactTotal');
+    if (exTotal) exTotal.textContent = '≈ ' + fmtMl(count * unitVolMl()) + ' of ' + fmtMl(calc.total) + ' today';
+
     renderWhy(calc, targetUnits);
     renderHistory();
     renderSparkline(targetUnits);
