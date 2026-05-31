@@ -43,6 +43,7 @@
   let audioEl = null, ttsSourceNode = null;
   let audioUnlocked = false;
   let smoothAmp = 0;
+  let lastSpeechTs = 0;      // last time recognition heard anything
   let history = [];          // [{role, content}]
   let busy = false;          // awaiting Claude/TTS
 
@@ -224,7 +225,12 @@
     ctx2d.clearRect(0, 0, ORB, ORB);
 
     let target = 0;
-    if (visualState === 'listening') target = amplitude(analyserMic);
+    if (visualState === 'listening') {
+      // Mic is owned by SpeechRecognition (not exposed), so animate the
+      // listening orb procedurally and surge when speech was just heard.
+      const recent = (Date.now() - lastSpeechTs) < 500;
+      target = 0.22 + Math.abs(Math.sin(ts / 140)) * (recent ? 0.55 : 0.18) + (recent ? 0.18 : 0);
+    }
     else if (visualState === 'speaking') target = amplitude(analyserTts);
     else target = 0.04 + Math.sin(ts / 900) * 0.03 + 0.03;   // idle breathing
     smoothAmp += (target - smoothAmp) * 0.18;
@@ -327,12 +333,13 @@
       micGranted = true;
       try { localStorage.setItem('divine-mic-granted', '1'); } catch (e) {}
       removePerm();
+      // Release the mic immediately. SpeechRecognition manages its OWN
+      // capture, and keeping a getUserMedia stream open at the same time
+      // makes recognition silently fail in many Chromium builds. We only
+      // needed getUserMedia to obtain the permission grant + friendly prompt.
+      try { micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+      micStream = null;
       ensureAudioCtx();
-      try {
-        const src = audioCtx.createMediaStreamSource(micStream);
-        analyserMic = audioCtx.createAnalyser(); analyserMic.fftSize = 1024;
-        src.connect(analyserMic);   // not connected to destination — no feedback
-      } catch (e) {}
       setupRecognition();
       if (!IS_MOBILE) { startRecognition(); setHint('listening'); }
       else { setHint('tap to talk'); if (fromGesture) startRecognition(); }
@@ -360,7 +367,19 @@
     recognition.interimResults = true;
     recognition.continuous = !IS_MOBILE;   // continuous desktop, single-shot mobile
     recognition.onstart = () => { recognizing = true; if (visualState !== 'speaking') setState('listening'); };
-    recognition.onerror = (ev) => { if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') micGranted = false; };
+    recognition.onerror = (ev) => {
+      if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
+        micGranted = false;
+        showCaption('Microphone permission is blocked — enable it in your browser to speak with me.', 7000);
+      } else if (ev.error === 'network') {
+        // Brave, and some privacy browsers, block the speech-recognition
+        // backend entirely. This is the classic symptom.
+        showCaption('Your browser is blocking speech recognition (common in Brave & Firefox). Divine hears best in Chrome, Edge, or Safari.', 8000);
+        setHint('unsupported browser');
+      } else if (ev.error === 'no-speech') {
+        setHint(IS_MOBILE ? 'tap to talk' : 'listening');
+      }
+    };
     recognition.onend = () => {
       recognizing = false;
       if (visualState === 'listening') setState('idle');
@@ -370,6 +389,7 @@
       }
     };
     recognition.onresult = (ev) => {
+      lastSpeechTs = Date.now();
       let finalText = '';
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const r = ev.results[i];
